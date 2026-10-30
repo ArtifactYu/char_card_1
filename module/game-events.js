@@ -124,6 +124,7 @@ async function handleEventOption(optionIndex, option) {
             
             // 触发特殊事件
             const result = await triggerSpecialEvent(specialEvent);
+                        if (typeof updateDungeonUI === 'function') updateDungeonUI();
             
             // 独立前端：委托给 pipeline 处理文本渲染
             if (result && result.standalone && typeof pipeline !== 'undefined' && pipeline.handleSpecialEvent) {

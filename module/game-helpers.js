@@ -1285,7 +1285,8 @@ function updateLocationHeadcountLabels() {
             nvdizi: 0,
             shanmen: 0,
             gongtian: 0,
-            danfang: 0
+            danfang: 0,
+            dilao: 0
         };
 
         if (currentNpcLocations && typeof currentNpcLocations === 'object') {

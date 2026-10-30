@@ -98,6 +98,7 @@
                     <div class="location" id="shanmen"></div>
                     <div class="location" id="gongtian"></div>
                     <div class="location" id="danfang"></div>
+                <div class="location" id="dilao" style="display:none"></div>
                     <div class="ink-decoration ink1"></div>
                     <div class="ink-decoration ink2"></div>
                     <!-- 建筑轮廓与热区（SVG覆盖层） -->
@@ -354,6 +355,17 @@
                     <div class="npc-container" id="danfang-npcs"></div>
                     <div class="scene-actions">
                         <button class="scene-btn" onclick="performAction('炼丹', 'danfang')">炼丹</button>
+                    </div>
+                </div>
+
+                <div id="dilao-scene" class="scene">
+                    <button class="back-btn" onclick="backToMap()">返回</button>
+                    <div class="scene-title">地牢</div>
+                    <div class="npc-container" id="dilao-npcs"></div>
+                    <div class="scene-actions">
+                        <button class="scene-btn dungeon-act-btn" id="dungeon-guest-btn" onclick="dungeonAction('guest')">带人进来</button>
+                        <button class="scene-btn dungeon-act-btn" id="dungeon-train-btn" onclick="dungeonAction('train')">调教</button>
+                        <button class="scene-btn dungeon-act-btn" id="dungeon-punish-btn" onclick="dungeonAction('punish')">惩戒</button>
                     </div>
                 </div>
 
@@ -1368,6 +1380,7 @@
                         // 触发特殊事件（会应用效果、标记已触发、发送预设文本）
                         // 传递 fromSkipWeek: true 标识是由跳过一周按钮触发的
                         await triggerSpecialEvent(specialEvent, { fromSkipWeek: true });
+                            if (typeof updateDungeonUI === 'function') updateDungeonUI();
                     } else {
                         // 无特殊事件，发送普通的新周消息
                         await handleMessageOutput(
@@ -1723,7 +1736,113 @@
             }
         }
 
-        // 修改 backToMap 函数
+
+        // 地牢界面初始化（等存档加载完成后再跑一次）
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                if (typeof updateDungeonUI === 'function') updateDungeonUI();
+            }, 1200);
+        });
+
+                // ===== 地牢：显隐 / 三态按钮 / 带人 =====
+        function getDungeonGuests() {
+            if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) return [];
+            return Object.keys(currentNpcLocations).filter(function (id) { return currentNpcLocations[id] === 'dilao'; });
+        }
+
+        function revealDungeon() {
+            var el = document.getElementById('dilao');
+            if (el) el.style.display = '';
+            var poly = document.querySelector('#map-hit-areas polygon[data-location="dilao"]');
+            if (poly) poly.style.display = '';
+        }
+
+        function updateDungeonUI() {
+            try {
+                var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+                var unlocked = !!gd.dungeonUnlocked;
+                var authorized = !!gd.dungeonAuthorized;
+                var dongtingOK = !!gd.dungeonAuthorizedDongting;
+
+                var label = document.getElementById('dilao');
+                if (label) label.style.display = unlocked ? '' : 'none';
+                var poly = document.querySelector('#map-hit-areas polygon[data-location="dilao"]');
+                if (poly) poly.style.display = unlocked ? '' : 'none';
+
+                // 未特批时，洞庭君不能被带进地牢
+                if (!dongtingOK && typeof currentNpcLocations === 'object' && currentNpcLocations && currentNpcLocations.B === 'dilao') {
+                    currentNpcLocations.B = 'none';
+                }
+
+                var guests = getDungeonGuests().length;
+                var guestBtn = document.getElementById('dungeon-guest-btn');
+                var trainBtn = document.getElementById('dungeon-train-btn');
+                var punishBtn = document.getElementById('dungeon-punish-btn');
+                if (guestBtn) guestBtn.classList.toggle('dungeon-locked', !authorized);
+                if (trainBtn) trainBtn.classList.toggle('dungeon-locked', !authorized || guests === 0);
+                if (punishBtn) punishBtn.classList.toggle('dungeon-locked', !authorized || guests === 0);
+            } catch (e) { console.warn('[Dungeon] updateDungeonUI:', e); }
+        }
+
+        function dungeonAction(kind) {
+            var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            if (!gd.dungeonAuthorized) { showModal('洞庭君还没把这里交给你。'); return; }
+            var guests = getDungeonGuests();
+            if (kind !== 'guest' && guests.length === 0) { showModal('这里没有可以处置的人。'); return; }
+            if (kind === 'guest') { openDungeonGuestPicker(); return; }
+            performAction(kind === 'train' ? '调教' : '惩戒', 'dilao');
+        }
+
+        function openDungeonGuestPicker() {
+            closeDungeonGuestPicker();
+            var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            var dongtingOK = !!gd.dungeonAuthorizedDongting;
+            var guests = getDungeonGuests();
+            var ids = Object.keys(npcs).filter(function (id) { return typeof npcVisibility === 'undefined' || npcVisibility[id]; });
+
+            var rows = ids.map(function (id) {
+                var isDt = (id === 'B');
+                var locked = isDt && !dongtingOK;
+                var checked = guests.indexOf(id) !== -1 ? ' checked' : '';
+                var disabled = locked ? ' disabled' : '';
+                var note = locked ? '<span class="dungeon-picker-note">此事另有章程</span>' : '';
+                return '<label class="dungeon-picker-row' + (locked ? ' locked' : '') + '">' +
+                    '<input type="checkbox" value="' + id + '"' + checked + disabled + '>' +
+                    '<span>' + npcs[id].name + '</span>' + note + '</label>';
+            }).join('');
+
+            var el = document.createElement('div');
+            el.id = 'dungeon-guest-picker';
+            el.className = 'dungeon-picker';
+            el.innerHTML = '<div class="dungeon-picker-panel">' +
+                '<div class="dungeon-picker-title">带谁下去（最多两人）</div>' +
+                '<div class="dungeon-picker-list">' + rows + '</div>' +
+                '<div class="dungeon-picker-actions">' +
+                '<button class="dungeon-picker-btn" onclick="closeDungeonGuestPicker()">取消</button>' +
+                '<button class="dungeon-picker-btn primary" onclick="applyDungeonGuests()">确定</button>' +
+                '</div></div>';
+            document.body.appendChild(el);
+        }
+
+        function closeDungeonGuestPicker() {
+            var el = document.getElementById('dungeon-guest-picker');
+            if (el) el.remove();
+        }
+
+        function applyDungeonGuests() {
+            var box = document.getElementById('dungeon-guest-picker');
+            if (!box) return;
+            var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; });
+            if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
+            getDungeonGuests().forEach(function (id) { currentNpcLocations[id] = 'none'; });
+            picked.forEach(function (id) { currentNpcLocations[id] = 'dilao'; });
+            closeDungeonGuestPicker();
+            if (typeof displayNpcs === 'function') displayNpcs('dilao');
+            if (typeof updateLocationHeadcountLabels === 'function') updateLocationHeadcountLabels();
+            updateDungeonUI();
+        }
+
+                // 修改 backToMap 函数
         function backToMap() {
             // 移除返回按钮的偏移类
             const backBtns = document.querySelectorAll('.back-btn.slg-mode-offset');
@@ -1762,6 +1881,7 @@
 
                 document.getElementById('map-scene').classList.add('active');
                 userLocation = 'tianshanpai';
+                if (typeof updateDungeonUI === 'function') updateDungeonUI();
 
                 // 取消地图高亮与弹窗
                 try {
@@ -2066,6 +2186,7 @@
             
             userLocation = locationId;
             switchScene(locationId);
+            if (typeof updateDungeonUI === 'function') updateDungeonUI();
         }
 
         // 发送自由行动
@@ -3798,7 +3919,8 @@
                 { id: 'huofang', name: '伙房', points: '879,704 888,639 868,630 869,618 882,618 915,459 909,453 912,449 933,450 954,445 975,433 991,450 1008,461 1030,471 1035,474 1033,478 1027,478 1027,511 1025,546 1027,586 1030,624 1030,653 1038,659 1041,672 1030,679 1012,672 998,731 885,707' },
                 { id: 'shanmen', name: '山门', points: '565,725 525,811 501,869 473,914 440,969 424,990 552,993 565,954 586,902 607,841 628,792 644,753 571,729' },
                 { id: 'houshan', name: '后山', points: '1457,141 1439,142 1429,149 1412,168 1406,184 1394,201 1387,214 1376,213 1368,228 1363,239 1354,245 1345,242 1342,236 1339,228 1339,219 1329,219 1322,219 1313,223 1310,230 1310,236 1310,245 1305,252 1300,255 1284,290 1274,300 1264,303 1258,317 1247,320 1232,351 1218,375 1199,407 1283,448 1368,450 1458,449 1458,148' },
-                { id: 'danfang', name: '丹房', points: '494,579 462,573 438,569 416,563 399,495 374,485 393,478 407,471 417,459 520,381 540,361 543,352 548,352 566,375 584,387 607,393 603,400 608,469 578,501 542,536 500,578' }
+                { id: 'danfang', name: '丹房', points: '494,579 462,573 438,569 416,563 399,495 374,485 393,478 407,471 417,459 520,381 540,361 543,352 548,352 566,375 584,387 607,393 603,400 608,469 578,501 542,536 500,578' },
+                { id: 'dilao', name: '地牢', points: '318,670 398,670 398,730 318,730', hidden: true }
             ];
 
             svg.innerHTML = '';
@@ -3806,6 +3928,7 @@
                 const p = document.createElementNS('http://www.w3.org/2000/svg','polygon');
                 p.setAttribute('points', b.points);
                 p.dataset.location = b.id;
+                if (b.hidden) p.style.display = 'none';
 
                 // 新增：悬浮事件 - 古风UI时显示框选图片
                 p.addEventListener('mouseenter', (e) => {
