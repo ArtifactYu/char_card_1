@@ -2189,6 +2189,7 @@
             userLocation = locationId;
             switchScene(locationId);
             if (typeof updateDungeonUI === 'function') updateDungeonUI();
+            if (locationId === 'dilao' && typeof updateSceneBackgrounds === 'function') updateSceneBackgrounds();
         }
 
         // 发送自由行动
