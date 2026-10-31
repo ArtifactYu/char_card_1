@@ -1743,6 +1743,8 @@
         }, 1200);
 
                 // ===== 地牢：显隐 / 三态按钮 / 带人 =====
+        // 地牢只允许带入女性角色（L 神秘杂役性别不明，同样排除）
+        var DUNGEON_FEMALE_NPCS = ["B","C","D","E","F","H","I","J","K","N","O"];
         function getDungeonGuests() {
             if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) return [];
             return Object.keys(currentNpcLocations).filter(function (id) { return currentNpcLocations[id] === 'dilao'; });
@@ -1768,10 +1770,12 @@
                 if (poly) poly.style.display = unlocked ? '' : 'none';
 
                 // 未特批时，洞庭君不能被带进地牢
-                if (!dongtingOK && typeof currentNpcLocations === 'object' && currentNpcLocations && currentNpcLocations.B === 'dilao') {
-                    currentNpcLocations.B = 'none';
+                if (typeof currentNpcLocations === 'object' && currentNpcLocations) {
+                    if (!dongtingOK && currentNpcLocations.B === 'dilao') currentNpcLocations.B = 'none';
+                    Object.keys(currentNpcLocations).forEach(function (id) {
+                        if (currentNpcLocations[id] === 'dilao' && DUNGEON_FEMALE_NPCS.indexOf(id) === -1) currentNpcLocations[id] = 'none';
+                    });
                 }
-
                 var guests = getDungeonGuests().length;
                 var guestBtn = document.getElementById('dungeon-guest-btn');
                 var trainBtn = document.getElementById('dungeon-train-btn');
@@ -1796,7 +1800,7 @@
             var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             var dongtingOK = !!gd.dungeonAuthorizedDongting;
             var guests = getDungeonGuests();
-            var ids = Object.keys(npcs).filter(function (id) { return typeof npcVisibility === 'undefined' || npcVisibility[id]; });
+            var ids = Object.keys(npcs).filter(function (id) { return (typeof npcVisibility === 'undefined' || npcVisibility[id]) && DUNGEON_FEMALE_NPCS.indexOf(id) !== -1; });
 
             var rows = ids.map(function (id) {
                 var isDt = (id === 'B');
@@ -1830,7 +1834,7 @@
         function applyDungeonGuests() {
             var box = document.getElementById('dungeon-guest-picker');
             if (!box) return;
-            var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; });
+            var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; }).filter(function (id) { return DUNGEON_FEMALE_NPCS.indexOf(id) !== -1; });
             if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
             getDungeonGuests().forEach(function (id) { currentNpcLocations[id] = 'none'; });
             picked.forEach(function (id) { currentNpcLocations[id] = 'dilao'; });
