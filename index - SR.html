@@ -3937,7 +3937,7 @@
                 const p = document.createElementNS('http://www.w3.org/2000/svg','polygon');
                 p.setAttribute('points', b.points);
                 p.dataset.location = b.id;
-                if (b.hidden) p.style.display = 'none';
+                if (b.hidden && !(typeof gameData !== 'undefined' && gameData && gameData.dungeonUnlocked)) p.style.display = 'none';
 
                 // 新增：悬浮事件 - 古风UI时显示框选图片
                 p.addEventListener('mouseenter', (e) => {
