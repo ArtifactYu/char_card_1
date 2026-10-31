@@ -419,6 +419,7 @@ async function loadOrInitGameData(options = {}) {
         summaryHistory = summaryHistoryService.getAll();
         syncVariablesFromGameData();
         enamor = 0; // 对齐 SR：每次页面加载重置（SR 每轮重建 iframe 等效于此）
+        if (typeof updateDungeonUI === 'function') updateDungeonUI();
         return;
     }
     const renderer = getCurrentRenderer();
@@ -511,6 +512,7 @@ async function loadOrInitGameData(options = {}) {
 
     syncVariablesFromGameData();
     enamor = 0; // 每次初始化或加载完成后重置
+    if (typeof updateDungeonUI === 'function') updateDungeonUI();
 }
 
 async function saveGameData() {
