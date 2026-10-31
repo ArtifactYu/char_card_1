@@ -36,7 +36,7 @@
 
 // 自适应资源路径：index 链路用相对路径，index-SR 链路用 CDN 绝对路径
 // file:// 协议下（直接双击打开）也走 CDN，避免 Chrome CORS 拦截
-const _CDN_BASE = 'https://cdn.jsdelivr.net/gh/Ji-Haitang/char_card_1@main/';
+const _CDN_BASE = 'https://cdn.jsdelivr.net/gh/ArtifactYu/char_card_1@ba6f15fd61629076fd929f4b41d1ce6d45b4ef64/';
 const _PAGES_BASE = 'https://Ji-Haitang.github.io/char_card_1/';
 function _assetUrl(path) {
     const isFileProt = typeof location !== 'undefined' && location.protocol === 'file:';
