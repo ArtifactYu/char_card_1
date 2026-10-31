@@ -1557,7 +1557,7 @@ function updateSceneBackgrounds() {
     }
     
     // 更新其他场景背景
-    const sceneNames = ['yanwuchang', 'cangjingge', 'huofang', 'houshan', 'yishiting', 'tiejiangpu', 'nandizi', 'nvdizi', 'shanmen', 'gongtian', 'danfang'];
+    const sceneNames = ['yanwuchang', 'cangjingge', 'huofang', 'houshan', 'yishiting', 'tiejiangpu', 'nandizi', 'nvdizi', 'shanmen', 'gongtian', 'danfang', 'dilao'];
     const dayNight = dayNightStatus === 'night' ? '夜' : '昼';
     
     sceneNames.forEach(sceneName => {
