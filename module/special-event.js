@@ -115,7 +115,11 @@ const specialEvents = [
             "npcFavorability.B": { min: 65 },
             "playerStats.声望": { min: 55 }
         },
-        effects: {},
+        effects: {
+            "dungeonAuthorized": { set: true },
+            "currentNpcLocations.I": { set: "dilao" },
+            "currentNpcLocations.J": { set: "dilao" }
+        },
         text: `<SLG_MODE>
 
 <MAIN_TEXT>
@@ -152,7 +156,9 @@ const specialEvents = [
         },
         effects: {
             "dungeonAuthorized": { set: true },
-            "currentSpecialEvent": { set: "" }
+            "currentSpecialEvent": { set: "" },
+            "currentNpcLocations.I": { set: "dilao" },
+            "currentNpcLocations.J": { set: "dilao" }
         },
         text: `<SLG_MODE>
 
