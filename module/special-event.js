@@ -150,7 +150,7 @@ const specialEvents = [
         name: "地牢·授钥",
         priority: 899,
         conditions: {
-            "currentSpecialEvent": { equals: "Dungeon_Unlock_2a" },
+            "dungeonAuthorized": { equals: true },
             "npcFavorability.B": { min: 70 },
             "playerStats.声望": { min: 60 }
         },

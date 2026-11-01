@@ -1776,6 +1776,17 @@
                 var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
                 var unlocked = !!gd.dungeonUnlocked;
                 var authorized = !!gd.dungeonAuthorized;
+
+                // 旧存档迁移：2a 已触发但未授权（旧版 2a 没有授权效果）时补授权并放入涉事弟子
+                if (!gd.dungeonAuthorized && typeof triggeredEvents !== 'undefined' && triggeredEvents.indexOf('Dungeon_Unlock_2a') !== -1) {
+                    gd.dungeonAuthorized = true;
+                    dungeonAuthorized = true;
+                    authorized = true;
+                    if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
+                    if (currentNpcLocations.I !== 'dilao') currentNpcLocations.I = 'dilao';
+                    if (currentNpcLocations.J !== 'dilao') currentNpcLocations.J = 'dilao';
+                    if (typeof displayNpcs === 'function') displayNpcs('dilao');
+                }
                 var dongtingOK = !!gd.dungeonAuthorizedDongting;
 
                 // 未特批时，洞庭君作为地牢看守在场（只显示，不可处置）
@@ -1858,6 +1869,11 @@
             var box = document.getElementById('dungeon-guest-picker');
             if (!box) return;
             var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; }).filter(function (id) { return DUNGEON_FEMALE_NPCS.indexOf(id) !== -1; });
+            // 未特批时洞庭君只是看守，不占“最多两人”的名额
+            var gdPick = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            if (!gdPick.dungeonAuthorizedDongting) {
+                picked = picked.filter(function (id) { return id !== 'B'; });
+            }
             if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
             var gd0 = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             var keepB = !gd0.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao';
