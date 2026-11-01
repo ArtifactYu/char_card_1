@@ -96,6 +96,7 @@ let inputEnable = 1;  // 新增：自由行动输入框可用状态（1=可用�
 let dungeonUnlocked = false;            // 地牢地点是否解锁
 let dungeonAuthorized = false;          // 地牢处置权是否获得
 let dungeonAuthorizedDongting = false;  // 洞庭君特批
+let dungeonTrialActive = false;           // 2a 试弟子的临时状态
 let lastUserMessage = "";
 let summary_Small = "";
 let summary_Week = "";
@@ -233,7 +234,8 @@ function syncVariablesFromGameData() {
     inputEnable,       // 新增：自由行动输入框可用状态
     dungeonUnlocked,
     dungeonAuthorized,
-    dungeonAuthorizedDongting
+    dungeonAuthorizedDongting,
+    dungeonTrialActive = false
     } = gameData);
 
     if (!equipStats || typeof equipStats !== 'object') {
@@ -315,6 +317,7 @@ function syncGameDataFromVariables() {
     gameData.dungeonUnlocked = dungeonUnlocked;
     gameData.dungeonAuthorized = dungeonAuthorized;
     gameData.dungeonAuthorizedDongting = dungeonAuthorizedDongting;
+    gameData.dungeonTrialActive = dungeonTrialActive;
     randIdx = Math.floor(Math.random() * 4) + 1;
 }
 

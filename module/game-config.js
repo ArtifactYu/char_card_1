@@ -1032,7 +1032,8 @@ const defaultGameData = {
     locationVisit: null,     // 新增：当前"下山地点"访问会话的临时标记（{active,location,startUiIndex,startWeek}），返回天山派时清空
     dungeonUnlocked: false,          // 地牢是否已解锁（事件1：洞庭君带你下去）
     dungeonAuthorized: false,        // 地牢处置权是否已获得（事件2：她交给你钥匙）
-    dungeonAuthorizedDongting: false // 是否获得处置洞庭君本人的特批（事件3）
+    dungeonAuthorizedDongting: false, // 是否获得处置洞庭君本人的特批（事件2b）
+    dungeonTrialActive: false,         // 2a 试手弟子是否在场（跨周清理）
 };
 
 // === BGM 配置 ===

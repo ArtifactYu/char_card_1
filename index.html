@@ -2197,6 +2197,26 @@ const outPut = `
                 '确认跳过',
                 '确定要跳过这一周吗？',
                 async () => {
+                    // 跨周清理：2a 试手弟子一周后离场；未特批的洞庭君回议事厅
+                    try {
+                        if (typeof currentNpcLocations === 'object' && currentNpcLocations) {
+                            var gdSkip = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+                            if (typeof dungeonTrialActive !== 'undefined' && dungeonTrialActive) {
+                                currentNpcLocations.I = 'none';
+                                currentNpcLocations.J = 'none';
+                                dungeonTrialActive = false;
+                                gdSkip.dungeonTrialActive = false;
+                            }
+                            if (!gdSkip.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao') {
+                                currentNpcLocations.B = 'yishiting';
+                            }
+                            if (typeof displayNpcs === 'function') {
+                                var actSkip = document.querySelector('.scene.active');
+                                if (actSkip && actSkip.id === 'dilao-scene') displayNpcs('dilao');
+                            }
+                            if (typeof updateDungeonUI === 'function') updateDungeonUI();
+                        }
+                    } catch (e) { console.warn('[Dungeon] skipWeek cleanup:', e); }
                     currentWeek++;
                     actionPoints = 3;
                     userLocation = "tianshanpai";
@@ -2662,10 +2682,8 @@ const outPut = `
                     gd.dungeonAuthorized = true;
                     dungeonAuthorized = true;
                     authorized = true;
-                    if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
-                    if (currentNpcLocations.I !== 'dilao') currentNpcLocations.I = 'dilao';
-                    if (currentNpcLocations.J !== 'dilao') currentNpcLocations.J = 'dilao';
-                    if (typeof displayNpcs === 'function') displayNpcs('dilao');
+                    gd.dungeonTrialActive = false;
+                    if (typeof dungeonTrialActive !== 'undefined') dungeonTrialActive = false;
                 }
                 var dongtingOK = !!gd.dungeonAuthorizedDongting;
 

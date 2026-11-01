@@ -118,7 +118,8 @@ const specialEvents = [
         effects: {
             "dungeonAuthorized": { set: true },
             "currentNpcLocations.I": { set: "dilao" },
-            "currentNpcLocations.J": { set: "dilao" }
+            "currentNpcLocations.J": { set: "dilao" },
+            "dungeonTrialActive": { set: true }
         },
         text: `<SLG_MODE>
 
@@ -147,47 +148,8 @@ const specialEvents = [
     },
     {
         id: "Dungeon_Unlock_2b",
-        name: "地牢·授钥",
-        priority: 899,
-        conditions: {
-            "dungeonAuthorized": { equals: true },
-            "npcFavorability.B": { min: 70 },
-            "playerStats.声望": { min: 60 }
-        },
-        effects: {
-            "dungeonAuthorized": { set: true },
-            "currentSpecialEvent": { set: "" },
-            "currentNpcLocations.I": { set: "dilao" },
-            "currentNpcLocations.J": { set: "dilao" }
-        },
-        text: `<SLG_MODE>
-
-<MAIN_TEXT>
-你回到议事厅时，天已经黑透。洞庭君还坐在原处，案上多添了一盏灯，灯芯结着长长的灯花。
-她听你说完，没有立刻评价，只把那枚铜牌收了回去，又从袖中取出一把黄铜钥匙，放在桌沿：「话我听到了。你处置得有分寸，也没有徇私。」|议事厅|19:40|洞庭君:平静|none
-
-「地牢往后归你用。」她的声音很轻，却每个字都落得清楚，「三条：不闹出人命，不牵连门派，分寸自己拿。若有一日你拿不住分寸——」她看了你一眼，没把后半句说完。|议事厅|19:42|洞庭君:严肃|none
-</MAIN_TEXT>
-
-<SUMMARY>
-洞庭君认可了你的处置，把地牢的钥匙交给你，并立下三条规矩。
-</SUMMARY>
-
-<SIDE_NOTE>
-{
-  "时间": "19:42",
-  "用户": { "位置变动": "议事厅" },
-  "当前NPC": { "洞庭君": "严肃" },
-  "剧情基调": { "基调归类": "严肃", "置信度": 0.92, "判定依据": "授钥立规，语气郑重" }
-}
-</SIDE_NOTE>
-
-</SLG_MODE>`
-    },
-    {
-        id: "Dungeon_Unlock_3",
         name: "地牢·执刑之权",
-        priority: 898,
+        priority: 899,
         conditions: {
             "dungeonAuthorized": { equals: true },
             "npcFavorability.B": { min: 75 },
@@ -195,11 +157,16 @@ const specialEvents = [
         },
         effects: {
             "dungeonAuthorizedDongting": { set: true },
-            "currentNpcLocations.B": { set: "dilao" }
+            "currentNpcLocations.B": { set: "dilao" },
+            "currentNpcLocations.I": { set: "none" },
+            "currentNpcLocations.J": { set: "none" },
+            "dungeonTrialActive": { set: false },
+            "currentSpecialEvent": { set: "" }
         },
         promptOnly: true,
         prompt: "特殊剧情：洞庭君出了差错。请以此为开端，自由设计她犯了什么错、如何被揭出、长老会为何决定把处置她的权力交给你。不限定具体情节，但必须符合她刑罚长老的身份与当前好感度，并在场景结束时让{{user}}明确获得处置她的权力。"
     },
+
 
     {
         id: "Apprenticeship_Storyline_1",
@@ -4427,6 +4394,7 @@ function setValueByPath(path, newValue) {
             case 'dungeonUnlocked': dungeonUnlocked = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonUnlocked`); break;
             case 'dungeonAuthorized': dungeonAuthorized = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorized`); break;
             case 'dungeonAuthorizedDongting': dungeonAuthorizedDongting = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorizedDongting`); break;
+            case 'dungeonTrialActive': dungeonTrialActive = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonTrialActive`); break;
             default:
                 console.warn(`[SpecialEvent]   ✗ 无法设置顶层变量: ${parts[0]}（未在支持列表中）`);
         }
