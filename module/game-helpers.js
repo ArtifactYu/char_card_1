@@ -504,9 +504,8 @@ function displayNpcs(location) {
     }
 
     if (npcsAtLocation.length > 3) {
-        npcsAtLocation = npcsAtLocation.sort(() => Math.random() - 0.5);
         npcsAtLocation = npcsAtLocation.slice(0, 3);
-        console.log(`${location} 有超过3个NPC，随机显示其中3个`);
+        console.log(`${location} 有超过3个NPC，仅显示前3个`);
     }
 
     npcsAtLocation.forEach((npc, index) => {

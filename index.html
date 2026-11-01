@@ -2758,21 +2758,26 @@ const outPut = `
             var box = document.getElementById('dungeon-guest-picker');
             if (!box) return;
             var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; }).filter(function (id) { return DUNGEON_FEMALE_NPCS.indexOf(id) !== -1; });
-            // 未特批时洞庭君只是看守，不占“最多两人”的名额
+
             var gdPick = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
-            if (!gdPick.dungeonAuthorizedDongting) {
-                picked = picked.filter(function (id) { return id !== 'B'; });
-            }
-            if (gdPick.dungeonTrialActive) {
-                picked = picked.filter(function (id) { return id !== 'I' && id !== 'J'; });
-            }
-            if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
-            var gd0 = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
-            var keepB = !gd0.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao';
-            var keepTrial = !!gd0.dungeonTrialActive;
+            var keepB = !gdPick.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao';
+            var keepTrial = !!gdPick.dungeonTrialActive;
+
+            // 受保护、且已占立绘位的在场者：未特批的洞庭君、试手弟子
+            var protectedIds = getDungeonGuests().filter(function (id) {
+                if (keepB && id === 'B') return true;
+                if (keepTrial && (id === 'I' || id === 'J')) return true;
+                return false;
+            });
+            if (keepB) picked = picked.filter(function (id) { return id !== 'B'; });
+            if (keepTrial) picked = picked.filter(function (id) { return id !== 'I' && id !== 'J'; });
+
+            // 地牢立绘锁死 3 个：受保护者 + 新带的人 <= 3，且新带的不超过 2
+            var maxPicked = Math.min(2, 3 - protectedIds.length);
+            if (picked.length > maxPicked) { showModal('地牢最多容下三人。'); return; }
+
             getDungeonGuests().forEach(function (id) {
-                if (keepB && id === 'B') return;
-                if (keepTrial && (id === 'I' || id === 'J')) return;
+                if (protectedIds.indexOf(id) !== -1) return;
                 currentNpcLocations[id] = 'none';
             });
             picked.forEach(function (id) { currentNpcLocations[id] = 'dilao'; });
@@ -2781,7 +2786,6 @@ const outPut = `
             if (typeof updateLocationHeadcountLabels === 'function') updateLocationHeadcountLabels();
             updateDungeonUI();
         }
-
                 // 修改 backToMap 函数
         function backToMap() {
             // 移除返回按钮的偏移类
