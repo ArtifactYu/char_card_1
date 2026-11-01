@@ -618,6 +618,8 @@ function parseLLMResponse(response, mainTextContent) {
         }
     }
 
+    if (typeof updateDungeonUI === 'function') updateDungeonUI();
+
     // 处理随机事件
     if (response.随机事件) {
         currentRandomEvent = response.随机事件;

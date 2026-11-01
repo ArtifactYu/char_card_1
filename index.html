@@ -2612,6 +2612,7 @@ const outPut = `
             if (typeof updateLocationHeadcountLabels === 'function') {
                 updateLocationHeadcountLabels();
             }
+            if (typeof updateDungeonUI === 'function') updateDungeonUI();
         }
 
 
@@ -2666,6 +2667,7 @@ const outPut = `
         }
 
         function dungeonAction(kind) {
+            if (typeof updateDungeonUI === 'function') updateDungeonUI();
             var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             if (!gd.dungeonAuthorized) { showModal('洞庭君还没把这里交给你。'); return; }
             var guests = getDungeonGuests();
