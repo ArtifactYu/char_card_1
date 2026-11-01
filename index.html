@@ -2457,7 +2457,7 @@ const outPut = `
 
             checkAllValueRanges();
 
-            const npcsPresent = getNpcsAtLocation(location).map(npc => npc.name).join('、') || '无';
+            const npcsPresent = getNpcsAtLocation(location).filter(npc => isDungeonGuestActionable(npc.id, location)).map(npc => npc.name).join('、') || '无';
 
             const calcText = `(${randomRoll.toFixed(2)}+${config.talentBonus}补正${talentBonus.toFixed(2)}) x 体力和难度系数${moodFactor.toFixed(2)} = ${finalValue.toFixed(2)}`;
             let changeText = '';
@@ -2631,6 +2631,19 @@ const outPut = `
             return Object.keys(currentNpcLocations).filter(function (id) { return currentNpcLocations[id] === 'dilao'; });
         }
 
+        // 可被调教/惩戒的对象：未特批前排除洞庭君（但她仍留在场景里显示）
+        function getDungeonActionableGuests() {
+            var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            var dongtingOK = !!gd.dungeonAuthorizedDongting;
+            return getDungeonGuests().filter(function (id) { return id !== 'B' || dongtingOK; });
+        }
+
+        function isDungeonGuestActionable(npcId, location) {
+            if (location !== 'dilao' || npcId !== 'B') return true;
+            var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            return !!gd.dungeonAuthorizedDongting;
+        }
+
         function revealDungeon() {
             var el = document.getElementById('dilao');
             if (el) el.style.display = '';
@@ -2651,12 +2664,11 @@ const outPut = `
                 if (poly) poly.style.display = unlocked ? '' : 'none';
 
                 if (typeof currentNpcLocations === 'object' && currentNpcLocations) {
-                    if (!dongtingOK && currentNpcLocations.B === 'dilao') currentNpcLocations.B = 'none';
                     Object.keys(currentNpcLocations).forEach(function (id) {
                         if (currentNpcLocations[id] === 'dilao' && DUNGEON_FEMALE_NPCS.indexOf(id) === -1) currentNpcLocations[id] = 'none';
                     });
                 }
-                var guests = getDungeonGuests().length;
+                var guests = getDungeonActionableGuests().length;
                 var guestBtn = document.getElementById('dungeon-guest-btn');
                 var trainBtn = document.getElementById('dungeon-train-btn');
                 var punishBtn = document.getElementById('dungeon-punish-btn');
@@ -2670,12 +2682,7 @@ const outPut = `
             if (typeof updateDungeonUI === 'function') updateDungeonUI();
             var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             if (!gd.dungeonAuthorized) { showModal('洞庭君还没把这里交给你。'); return; }
-            // 未特批前，洞庭君不能被带进/留在地牢，也不能被处置
-            if (!gd.dungeonAuthorizedDongting && typeof currentNpcLocations === 'object' && currentNpcLocations && currentNpcLocations.B === 'dilao') {
-                currentNpcLocations.B = 'none';
-                if (typeof updateDungeonUI === 'function') updateDungeonUI();
-            }
-            var guests = getDungeonGuests();
+            var guests = getDungeonActionableGuests();
             if (kind !== 'guest' && guests.length === 0) { showModal('这里没有可以处置的人。'); return; }
             if (kind === 'guest') { openDungeonGuestPicker(); return; }
             performAction(kind === 'train' ? '调教' : '惩戒', 'dilao');
@@ -2722,7 +2729,9 @@ const outPut = `
             if (!box) return;
             var picked = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]:checked')).map(function (b) { return b.value; }).filter(function (id) { return DUNGEON_FEMALE_NPCS.indexOf(id) !== -1; });
             if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
-            getDungeonGuests().forEach(function (id) { currentNpcLocations[id] = 'none'; });
+            var gd0 = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
+            var keepB = !gd0.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao';
+            getDungeonGuests().forEach(function (id) { if (!(keepB && id === 'B')) currentNpcLocations[id] = 'none'; });
             picked.forEach(function (id) { currentNpcLocations[id] = 'dilao'; });
             closeDungeonGuestPicker();
             if (typeof displayNpcs === 'function') displayNpcs('dilao');
@@ -3163,7 +3172,7 @@ const outPut = `
                 const activeScene = document.querySelector('.scene.active');
                 let currentLocation = '';
                 
-                const npcsPresent = getNpcsAtLocation(userLocation).map(npc => npc.name).join('、') || '无';
+                const npcsPresent = getNpcsAtLocation(userLocation).filter(npc => isDungeonGuestActionable(npc.id, userLocation)).map(npc => npc.name).join('、') || '无';
                 
                 let locationInfo = '';
                 if (activeScene.id === 'map-scene') {

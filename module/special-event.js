@@ -76,7 +76,8 @@ const specialEvents = [
         },
         effects: {
             "dungeonUnlocked": { set: true },
-            "currentSpecialEvent": { set: "" }
+            "currentSpecialEvent": { set: "" },
+            "currentNpcLocations.B": { set: "dilao" }
         },
         text: `<SLG_MODE>
 
@@ -187,7 +188,8 @@ const specialEvents = [
             "playerStats.声望": { min: 70 }
         },
         effects: {
-            "dungeonAuthorizedDongting": { set: true }
+            "dungeonAuthorizedDongting": { set: true },
+            "currentNpcLocations.B": { set: "dilao" }
         },
         promptOnly: true,
         prompt: "特殊剧情：洞庭君出了差错。请以此为开端，自由设计她犯了什么错、如何被揭出、长老会为何决定把处置她的权力交给你。不限定具体情节，但必须符合她刑罚长老的身份与当前好感度，并在场景结束时让{{user}}明确获得处置她的权力。"
@@ -4427,6 +4429,7 @@ function setValueByPath(path, newValue) {
         const globalVars = {
             npcFavorability: typeof npcFavorability !== 'undefined' ? npcFavorability : null,
             npcVisibility: typeof npcVisibility !== 'undefined' ? npcVisibility : null,
+            currentNpcLocations: typeof currentNpcLocations !== 'undefined' ? currentNpcLocations : null,
             playerTalents: typeof playerTalents !== 'undefined' ? playerTalents : null,
             playerStats: typeof playerStats !== 'undefined' ? playerStats : null,
             combatStats: typeof combatStats !== 'undefined' ? combatStats : null,
