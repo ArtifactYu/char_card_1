@@ -2670,6 +2670,11 @@ const outPut = `
             if (typeof updateDungeonUI === 'function') updateDungeonUI();
             var gd = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             if (!gd.dungeonAuthorized) { showModal('洞庭君还没把这里交给你。'); return; }
+            // 未特批前，洞庭君不能被带进/留在地牢，也不能被处置
+            if (!gd.dungeonAuthorizedDongting && typeof currentNpcLocations === 'object' && currentNpcLocations && currentNpcLocations.B === 'dilao') {
+                currentNpcLocations.B = 'none';
+                if (typeof updateDungeonUI === 'function') updateDungeonUI();
+            }
             var guests = getDungeonGuests();
             if (kind !== 'guest' && guests.length === 0) { showModal('这里没有可以处置的人。'); return; }
             if (kind === 'guest') { openDungeonGuestPicker(); return; }
