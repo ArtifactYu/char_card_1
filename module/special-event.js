@@ -119,7 +119,8 @@ const specialEvents = [
             "dungeonAuthorized": { set: true },
             "currentNpcLocations.I": { set: "dilao" },
             "currentNpcLocations.J": { set: "dilao" },
-            "dungeonTrialActive": { set: true }
+            "dungeonTrialActive": { set: true },
+            "currentSpecialEvent": { set: "" }
         },
         text: `<SLG_MODE>
 
@@ -152,6 +153,7 @@ const specialEvents = [
         priority: 899,
         conditions: {
             "dungeonAuthorized": { equals: true },
+            "dungeonAuthorizedDongting": { equals: false },
             "npcFavorability.B": { min: 75 },
             "playerStats.声望": { min: 70 }
         },
@@ -4391,10 +4393,10 @@ function setValueByPath(path, newValue) {
             case 'companionNPC': companionNPC = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 companionNPC`); break;
             case 'inputEnable': inputEnable = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 inputEnable`); if (typeof updateFreeActionInputState === 'function') { updateFreeActionInputState(); } break;
             case 'currentSpecialEvent': currentSpecialEvent = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 currentSpecialEvent`); break;
-            case 'dungeonUnlocked': dungeonUnlocked = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonUnlocked`); break;
-            case 'dungeonAuthorized': dungeonAuthorized = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorized`); break;
-            case 'dungeonAuthorizedDongting': dungeonAuthorizedDongting = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorizedDongting`); break;
-            case 'dungeonTrialActive': dungeonTrialActive = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonTrialActive`); break;
+            case 'dungeonUnlocked': dungeonUnlocked = newValue; if (typeof gameData !== 'undefined' && gameData) gameData.dungeonUnlocked = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonUnlocked`); break;
+            case 'dungeonAuthorized': dungeonAuthorized = newValue; if (typeof gameData !== 'undefined' && gameData) gameData.dungeonAuthorized = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorized`); break;
+            case 'dungeonAuthorizedDongting': dungeonAuthorizedDongting = newValue; if (typeof gameData !== 'undefined' && gameData) gameData.dungeonAuthorizedDongting = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonAuthorizedDongting`); break;
+            case 'dungeonTrialActive': dungeonTrialActive = newValue; if (typeof gameData !== 'undefined' && gameData) gameData.dungeonTrialActive = newValue; console.log(`[SpecialEvent]   ✓ 已设置顶层变量 dungeonTrialActive`); break;
             default:
                 console.warn(`[SpecialEvent]   ✗ 无法设置顶层变量: ${parts[0]}（未在支持列表中）`);
         }

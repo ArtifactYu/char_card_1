@@ -1884,10 +1884,18 @@
             if (!gdPick.dungeonAuthorizedDongting) {
                 picked = picked.filter(function (id) { return id !== 'B'; });
             }
+            if (gdPick.dungeonTrialActive) {
+                picked = picked.filter(function (id) { return id !== 'I' && id !== 'J'; });
+            }
             if (picked.length > 2) { showModal('地牢最多容下两人。'); return; }
             var gd0 = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
             var keepB = !gd0.dungeonAuthorizedDongting && currentNpcLocations.B === 'dilao';
-            getDungeonGuests().forEach(function (id) { if (!(keepB && id === 'B')) currentNpcLocations[id] = 'none'; });
+            var keepTrial = !!gd0.dungeonTrialActive;
+            getDungeonGuests().forEach(function (id) {
+                if (keepB && id === 'B') return;
+                if (keepTrial && (id === 'I' || id === 'J')) return;
+                currentNpcLocations[id] = 'none';
+            });
             picked.forEach(function (id) { currentNpcLocations[id] = 'dilao'; });
             closeDungeonGuestPicker();
             if (typeof displayNpcs === 'function') displayNpcs('dilao');
