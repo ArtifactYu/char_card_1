@@ -2669,14 +2669,6 @@ const outPut = `
                 }
                 var dongtingOK = !!gd.dungeonAuthorizedDongting;
 
-                // 未特批时，洞庭君作为地牢看守在场（只显示，不可处置）
-                if (unlocked && !dongtingOK) {
-                    if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
-                    if (currentNpcLocations.B !== 'dilao') {
-                        currentNpcLocations.B = 'dilao';
-                        if (typeof displayNpcs === 'function') displayNpcs('dilao');
-                    }
-                }
 
                 var label = document.getElementById('dilao');
                 if (label) label.style.display = unlocked ? '' : 'none';
@@ -3111,18 +3103,7 @@ const outPut = `
             switchScene(locationId);
             if (typeof updateDungeonUI === 'function') updateDungeonUI();
             if (locationId === 'dilao' && typeof updateSceneBackgrounds === 'function') updateSceneBackgrounds();
-            // 未特批时，地牢里应有洞庭君（只显示，不可处置）
-            if (locationId === 'dilao') {
-                var gdGo = (typeof gameData !== 'undefined' && gameData) ? gameData : {};
-                if (gdGo.dungeonUnlocked && !gdGo.dungeonAuthorizedDongting) {
-                    if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
-                    if (currentNpcLocations.B !== 'dilao') {
-                        currentNpcLocations.B = 'dilao';
-                        if (typeof displayNpcs === 'function') displayNpcs('dilao');
-                        if (typeof updateDungeonUI === 'function') updateDungeonUI();
-                    }
-                }
-            }
+
         }
 
         // 发送自由行动
