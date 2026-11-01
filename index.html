@@ -2658,15 +2658,12 @@ const outPut = `
                 var authorized = !!gd.dungeonAuthorized;
                 var dongtingOK = !!gd.dungeonAuthorizedDongting;
 
-                // 未特批时，地牢场景里保持洞庭君在场（只显示，不可处置）
+                // 未特批时，洞庭君作为地牢看守在场（只显示，不可处置）
                 if (unlocked && !dongtingOK) {
-                    var activeSceneEl = document.querySelector('.scene.active');
-                    if (activeSceneEl && activeSceneEl.id === 'dilao-scene') {
-                        if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
-                        if (currentNpcLocations.B !== 'dilao') {
-                            currentNpcLocations.B = 'dilao';
-                            if (typeof displayNpcs === 'function') displayNpcs('dilao');
-                        }
+                    if (typeof currentNpcLocations !== 'object' || !currentNpcLocations) currentNpcLocations = {};
+                    if (currentNpcLocations.B !== 'dilao') {
+                        currentNpcLocations.B = 'dilao';
+                        if (typeof displayNpcs === 'function') displayNpcs('dilao');
                     }
                 }
 
