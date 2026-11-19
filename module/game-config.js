@@ -36,7 +36,7 @@
 
 // 自适应资源路径：index 链路用相对路径，index-SR 链路用 CDN 绝对路径
 // file:// 协议下（直接双击打开）也走 CDN，避免 Chrome CORS 拦截
-const _CDN_BASE = 'https://cdn.jsdelivr.net/gh/Ji-Haitang/char_card_1@main/';
+const _CDN_BASE = 'https://cdn.jsdelivr.net/gh/ArtifactYu/char_card_1@dungeon-1.6/';
 const _PAGES_BASE = 'https://Ji-Haitang.github.io/char_card_1/';
 function _assetUrl(path) {
     const isFileProt = typeof location !== 'undefined' && location.protocol === 'file:';
@@ -182,6 +182,7 @@ const locationNames = {
     shanmen: '山门',
     gongtian: '公田',
     danfang: '丹房',
+    dilao: '地牢',
     tianshanpai: '天山派',
     none: 'none'
 };
@@ -343,7 +344,9 @@ const actionConfigs = {
     休息: { talentBonus: '心性', affects: '体力' },
     拜访: { talentBonus: '魅力', affects: '声望' },
     下山: { talentBonus: '心性', affects: '声望' },
-    炼丹: { talentBonus: '悟性', affects: '学识' }
+    炼丹: { talentBonus: '悟性', affects: '学识' },
+    调教: { talentBonus: '心性', affects: '学识' },
+    惩戒: { talentBonus: '心性', affects: '声望' }
 };
 
 const npcSparRewards = {
@@ -1027,6 +1030,10 @@ const defaultGameData = {
         location: { enabled: true }  // 地点更新（location-runner.runLocationUpdate），触发时机不变，仅控制开关
     },
     locationVisit: null,     // 新增：当前"下山地点"访问会话的临时标记（{active,location,startUiIndex,startWeek}），返回天山派时清空
+    dungeonUnlocked: false,          // 地牢是否已解锁（事件1：洞庭君带你下去）
+    dungeonAuthorized: false,        // 地牢处置权是否已获得（事件2：她交给你钥匙）
+    dungeonAuthorizedDongting: false, // 是否获得处置洞庭君本人的特批（事件2b）
+    dungeonTrialActive: false,         // 2a 试手弟子是否在场（跨周清理）
     sideQuest: {             // 新增：暗线/支线剧情系统状态（见 开发文档/支线剧情系统方案书.md）
         active: null,            // 进行中支线（含玩家不可见的剧情树）
         history: [],             // 已完结支线摘要，FIFO 上限 20
